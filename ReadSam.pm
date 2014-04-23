@@ -229,6 +229,13 @@ use strict;
     return join("\t", $self->qname, $self->flag, $self->rname, $self->position, $self->mapq, $self->cigar, $self->rnext, $self->pnext, $self->tlen, $self->sequence, $self->quality, $optional);
   }
 
+  sub reverse_complement{
+    my($in) = @_;
+    $in =~ tr/ACGTacgt/TGCAtgca/;
+    $in = reverse($in);
+    return($in);
+  }
+
   sub fastq {
     my ($self)   = @_;
     my $sequence = $self->sequence;
