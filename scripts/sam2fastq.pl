@@ -18,7 +18,8 @@ my $man = 0;
 my $help = 0;
 my $illumina;
 my $pair=0;
-GetOptions('pair=i' => \$pair, 'illumina|I' => \$illumina,'help|?' => \$help, man => \$man) or pod2usage(2);
+my $remove_unaligned = 0;
+GetOptions('pair=i' => \$pair, 'illumina|I' => \$illumina,'help|?' => \$help, man => \$man, 'remove-unaligned' => \$remove_unaligned) or pod2usage(2);
 pod2usage(2) if $help;
 pod2usage(-verbose => 2) if $man;
 pod2usage("$0: No files given.")  if ((@ARGV == 0) && (-t STDIN));
@@ -36,7 +37,10 @@ while(my $align = $sam->next_align){
   if($pair == 2){
     $align->qname($align->qname .= "/2");
   }
-  print $align->fastq;
+  if ((not $remove_unaligned) or not ($align->flag & 0x4))
+  {
+    print $align->fastq;
+  }
 }
 
 ###############################################################################
@@ -53,8 +57,9 @@ sam2fastq.pl - Converts a sam format to fastq format
 sam2fastq.pl [options] [file ...]
 
 Options:
-      -help
-      -man               for more info
+      -help,
+      --remove-unaligned  remove unaligned reads,
+      -man                for more info
 
 =head1 OPTIONS
 
